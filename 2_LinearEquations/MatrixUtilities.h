@@ -1,7 +1,9 @@
+#include <iostream>
 #include <TMatrixD.h>
 #include <TRandom3.h>
 #include <TArrayD.h>
 #include <TVectorD.h>
+using namespace std;
 
 TMatrixD RandMat(int MatN, int MatM) {
   // Returns a MatN x MatM matrix with random entries
@@ -37,7 +39,34 @@ TMatrixD RandMatInteger(int MatN, int MatM, int iMax = 10) {
   return C;
 };
 
-double VectorProjection(TVectorD A, TVectorD B) {
+// Defining dot product of vectors, can't see if this already exists...
+double VectorDot(TVectorD A, TVectorD B) {
+  // Assuming A and B have the same length
+  double k = 0.0;
+  int N = A.GetNoElements();
+  for (int j = 0; j < N; j++) k += A[j]*B[j];
+  return k;
+};
+
+TVectorD VectorProjection(TVectorD A, TVectorD B) {
   // Calculates the projection of vector A onto vector B
-  return 0.0;
+  int N = A.GetNoElements();
+  TVectorD ProjectedVector(N);
+  double Coefficient = VectorDot(A,B)/VectorDot(B,B);
+  ProjectedVector = Coefficient*B;
+  return ProjectedVector;
+};
+
+TMatrixD VectorProjectionMatrix(TMatrixD A, TMatrixD B) {
+  // Calculates the projection of A onto B, both are Nx1 matrices
+  int N = A.GetNrows();
+  TMatrixD ProjectedVector(N,1);
+  TMatrixD temp1 = A.T()*B;
+  double coef1 = TMatrixDRow(temp1,0)[0];
+  double coef2 = 0.0;
+  for (int i = 0; i < N; i++) coef2 += TMatrixDRow(B,i)[0]*TMatrixDRow(B,i)[0];
+  double Coefficient = coef1/coef2;
+  ProjectedVector = Coefficient*B;
+
+  return ProjectedVector;
 };

@@ -50,7 +50,7 @@ int main() {
   vecPrint(V.Vect());
 
   // Another useful class is the N-vector of TVectorD
-  TVectorD Y[7];
+  TVectorD Y(7);
   Y[2] = 3.0; Y[6] = 0.1; // How to fill
 
 

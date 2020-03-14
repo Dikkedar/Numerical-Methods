@@ -1,7 +1,7 @@
 #include <iostream>
 #include <TMatrixD.h>
 #include <TVectorD.h>
-//#include "MatrixUtilities.h"
+#include "MatrixUtilities.h"
 using namespace std;
 
 /*
@@ -43,29 +43,48 @@ public:
 
 */
 
+
+
 void QRDecomposition::GramSchmidt() {
   /*
      Decomposition by Gram Schmidt orthogonalization of column vectors a_i in AMat
-     The orthogonalized vectors q_i make up the orthogonal Q
+     The orthogonalized vectors q_i make up the columns of Q
      R is then calculated by A=QR => R = Q^T * A
   */
+  cout << "DEBUG TESING" << endl;
+  TMatrixD QProto(N,M); // Array containing the orthogonalized vectors
 
-  TMatrixD QProtoMat(N,M);
+  // Set the first Q-vector
+  TMatrixDColumn(QProto,0) = TMatrixDColumn(AMat,0);
+  QProto.Print();
 
   // Collect column vectors in AMat
-  for (int i = 0; i < M; i++) {
-    TVectorD a[N];  // The column in A
-    TVectorD q[N];  // The column in Q
+  for (int i = 1; i < M; i++) { // Loop over columns
+    TMatrixD a(N,1);  // The column in A
+    TMatrixDColumn(a,0) = TMatrixDColumn(AMat,i);
 
-    for (int j = 0; j < N; j++) a[j] = TMatrixDColumn(AMat,i)[j]; // Fill vector
+    // Calculate the orthogonalized vectors
+    TMatrixD ProjSum(N,1);
 
+    for (int l = 0; l < i; l++) {
+      TMatrixD NewProj(N,1);
+      TMatrixDColumn(NewProj,0) = TMatrixDColumn(QProto,l);
+      ProjSum += VectorProjectionMatrix(NewProj, a);
+      cout << "\n i =" << i << ", l = " << l << endl;
+    };
 
+    TMatrixD q(N,1);  // The column in Q
+    q = a - ProjSum;
 
-    //TMatrixDColumn(QProtoMat, i) = 0;
+    cout << "Test! i=" << i << ", q=";
+    q.Print();
+    TMatrixDColumn(QProto,i) = TMatrixDColumn(q,0);
   };
 
+  QMat = QProto;
 
-  cout << "Test!" << endl;
+  // Calculate RMat
+  RMat = QMat.T()*AMat;
 };
 
 
@@ -75,8 +94,41 @@ void QRDecomposition::GramSchmidt() {
 
 
 
+// LEGACY CODE
+/*
+void QRDecomposition::GramSchmidtOld() {
+  cout << "DEBUG TESING" << endl;
+  TVectorD QVecs[M]; // Array containing the orthogonalized vectors
 
+  // Collect column vectors in AMat
+  for (int i = 0; i < M; i++) { // Loop over columns
+    QVecs[M].ResizeTo(N);
+    TVectorD a(N);  // The column in A
+    TVectorD q(N);  // The column in Q
 
+    for (int j = 0; j < N; j++) a[j] = TMatrixDColumn(AMat,i)[j]; // Fill vector
+
+    // Calculate the orthogonalized vectors
+    TVectorD ProjSum(N);
+    for (int l = 0; l < i-1; l++) {
+      ProjSum += VectorProjection(QVecs[l], a);
+    };
+
+    q = a - ProjSum;
+    QVecs[i] = q; // Save them in the array
+  };
+
+  // Set new QMat
+  for (int i = 0; i < M; i++) { // Loop over columns
+    for (int j = 0; j < N; j++) { // Loop over entries in each column
+      TMatrixDColumn(QMat,i)[j] = QVecs[i][j];
+    };
+  };
+
+  // Calculate RMat
+  RMat = QMat.T()*AMat;
+};
+*/
 
 
 
