@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/emil/Documents/Code/C++/numerical_routines/ROOT/ROOTEquations.cxx
+iostream
+-
+TMath.h
+/home/emil/Documents/Code/C++/numerical_routines/ROOT/TMath.h
+Math/WrappedTF1.h
+/home/emil/Documents/Code/C++/numerical_routines/ROOT/Math/WrappedTF1.h
+

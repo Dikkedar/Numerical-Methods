@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.10)
+project(eulerProject)
+project(rk4Project)
+add_executable(eulerProject euler.cpp)
+add_executable(rk4Project rk4.cpp)

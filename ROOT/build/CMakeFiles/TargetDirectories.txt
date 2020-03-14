@@ -1,0 +1,5 @@
+/home/emil/Documents/Code/C++/numerical_routines/ROOT/build/CMakeFiles/rebuild_cache.dir
+/home/emil/Documents/Code/C++/numerical_routines/ROOT/build/CMakeFiles/edit_cache.dir
+/home/emil/Documents/Code/C++/numerical_routines/ROOT/build/CMakeFiles/equationROOT.dir
+/home/emil/Documents/Code/C++/numerical_routines/ROOT/build/CMakeFiles/linearROOT.dir
+/home/emil/Documents/Code/C++/numerical_routines/ROOT/build/CMakeFiles/integrationROOT.dir

@@ -1,0 +1,18 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/emil/Documents/Code/C++/numerical_routines/odes/euler.cpp
+iostream
+-
+string
+-
+stdio.h
+-
+cmath
+-
+
