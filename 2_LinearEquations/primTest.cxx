@@ -20,5 +20,9 @@ int main() {
   double c = TMatrixDRow(C,0)[0];
   cout << c << endl;
 
+  for (int i=5; i>=1; i--) {
+    cout << "test" << i << endl;
+  };
+
   return 0;
 };
