@@ -11,37 +11,42 @@ int main() {
 
   // Generate random matrix, integer entries
   TMatrixD TestMat(N,M);
-  TestMat = RandMatInteger(N,M);
+  TestMat = RandMatIntegerPos(N,M);
 
   QRDecomposition QRTest(TestMat);
+  cout << "\n************************" << endl;
+  cout << "QR Decomposition by Gram Schmidt Orthogonalization Test" << endl;
+  cout << "\n************************" << endl;
+  cout << "\nAMat";
   QRTest.AMat.Print();
 
   QRTest.GramSchmidt();
 
   cout << "\nAFTER DECOMPOSITION, QMat";
   QRTest.QMat.Print();
-  cout << "\nAFTER DECOMPOSITION, RMat";
-  QRTest.RMat.Print();
 
-  cout <<"\nSHOULD EQUAL UNITY";
   TMatrixD TestMat2(N,N);
-  TestMat2 = QRTest.QMat.T()*QRTest.QMat;
-  TestMat2.Print(); // Should equal unity
+  TMatrixD QTransp = Transpose(QRTest.QMat);
+  TestMat2 = QTransp*QRTest.QMat; // Should equal unity, check
 
-  cout << "\nTest finalized." << endl;
+  cout << "\nAFTER DECOMPOSITION, RMat";
+  QRTest.RMat.Print(); // Should be upper (right) triangular
+
+  cout << "\nDecomposition finalized." << endl;
 
   // Generate random c-vector for system A*x=c
   TMatrixD bvec(N,1);
   bvec = RandMatInteger(N,1,10);
+  cout << "The coefficient vector b is" << endl;
+  bvec.Print();
 
   // By QR decomposition, Ax=b => Rx = Q^T*b
   TMatrixD cvec(N,1);
-  cvec = QRTest.QMat.T()*bvec;
+  cvec = QRTest.QTransp*bvec;
 
   // Solve the system of equations Amat*x = bvec
-  TMatrixD eqSolution(N,1);
-  eqSolution = BackSubstitution(cvec, QRTest.RMat);
-  cout << "\nTHE SOLUTION IS";
+  TMatrixD eqSolution(N,1) = BackSubstitution(cvec, QRTest.RMat);
+  cout << "\nTHE SOLUTION TO AMat*x=b IS";
   eqSolution.Print();
 
   return 0;

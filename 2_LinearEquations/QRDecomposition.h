@@ -1,6 +1,7 @@
 #include <iostream>
 #include <TMatrixD.h>
 #include <TVectorD.h>
+#include <TMath.h>
 #include "MatrixUtilities.h"
 using namespace std;
 
@@ -19,6 +20,7 @@ class QRDecomposition {
 public:
   TMatrixD AMat;
   TMatrixD QMat;
+  TMatrixD QTransp;
   TMatrixD RMat;
   int N;
   int M;
@@ -28,6 +30,7 @@ public:
     M = inpMat.GetNcols();
     AMat.ResizeTo(N,M);
     QMat.ResizeTo(N,M);
+    QTransp.ResizeTo(M,N);
     RMat.ResizeTo(M,M);
     AMat = inpMat;
   };
@@ -52,7 +55,14 @@ void QRDecomposition::GramSchmidt() {
   TMatrixD QProto(N,M); // Array containing the orthogonalized vectors
 
   // Set the first Q-vector
-  TMatrixDColumn(QProto,0) = TMatrixDColumn(AMat,0);
+  TMatrixD q1(N,1);
+  TMatrixD a1(N,1);
+  for (int j = 0; j < N; j++) TMatrixDRow(a1,j)[0] = TMatrixDColumn(AMat,0)[j];
+  double q1leninv = 1/VectorDotMatrix(a1,a1);
+  q1 = a1;
+  q1 *= TMath::Sqrt(q1leninv);
+  TMatrixDColumn(QProto,0) = TMatrixDColumn(q1,0);
+  double Q;
 
   // Collect column vectors in AMat
   for (int i = 1; i < M; i++) { // Loop over columns
@@ -65,27 +75,42 @@ void QRDecomposition::GramSchmidt() {
     for (int l = 0; l < i; l++) {
       TMatrixD NewProj(N,1);
       TMatrixDColumn(NewProj,0) = TMatrixDColumn(QProto,l);
-      ProjSum += VectorProjectionMatrix(NewProj, a);
-      cout << "\n i =" << i << ", l = " << l << endl;
+      ProjSum += VectorProjectionMatrix(a, NewProj);
+      //cout << "\n i =" << i << ", l = " << l << endl;
     };
 
     TMatrixD q(N,1);  // The column in Q
     q = a - ProjSum;
 
-    cout << "Test! i=" << i << ", q=";
-    q.Print();
+    // Normalize q
+    double qleninv = 1/VectorDotMatrix(q,q);
+    q *= TMath::Sqrt(qleninv);
+
     TMatrixDColumn(QProto,i) = TMatrixDColumn(q,0);
+
+    // Check orthogonality
+    TMatrixD PrevCol(N,1);
+    TMatrixDColumn(PrevCol,0) = TMatrixDColumn(QProto,i-1);
+    double Ocheck = VectorDotMatrix(q,PrevCol);
+    cout << "i = " << i <<", orthogonality check = " << Ocheck << endl;
   };
 
   QMat = QProto;
 
   // Calculate RMat
-  RMat = QMat.T()*AMat;
+  TMatrixD QTr = Transpose(QMat);
+  QTransp = QTr;
+  RMat = QTr*AMat;
+
+
+  // Delete all elements smaller than tolerance in RMat
+  double Tol = 1e-10;
+  for (int i = 0; i < M; i++) {
+    for (int j = 0; j < M; j++) {
+      if (TMatrixDRow(RMat,i)[j] < Tol) TMatrixDRow(RMat,i)[j] = 0.0;
+    };
+  };
 };
-
-
-
-
 
 
 /*
@@ -103,6 +128,7 @@ TMatrixD BackSubstitution(TMatrixD cvec, TMatrixD U) {
   for (int i = N; i >= 1; i--) { // Loop over elements in y
 
     double Uii = TMatrixDRow(U,i)[i];
+    cout << Uii << endl;
     double ci = TMatrixDRow(cvec,i)[0];
     double yback = 0.0;
     for (int k = i+1; k <= N; k++) {
@@ -124,7 +150,14 @@ TMatrixD ForwardSubstitution(TMatrixD cvec, TMatrixD U) {
   return yvec;
 };
 
+TMatrixD QRSolveGramSchmidt(TMatrixD A, TMatrixD b) {
+  // Solve the linear system of equations Ax=b with QR decomposition
+  int N = b.GetNrows();
+  int M = A.GetNcols();
+  TMatrixD x(N,1);
 
+  return x;
+};
 
 
 
@@ -165,6 +198,46 @@ void QRDecomposition::GramSchmidtOld() {
       TMatrixDColumn(QMat,i)[j] = QVecs[i][j];
     };
   };
+
+  // Calculate RMat
+  RMat = QMat.T()*AMat;
+};
+
+void QRDecomposition::GramSchmidt() {
+
+     Decomposition by Gram Schmidt orthogonalization of column vectors a_i in AMat
+     The orthogonalized vectors q_i make up the columns of Q
+     R is then calculated by A=QR => R = Q^T * A
+
+  TMatrixD QProto(N,M); // Array containing the orthogonalized vectors
+
+  // Set the first Q-vector
+  TMatrixDColumn(QProto,0) = TMatrixDColumn(AMat,0);
+
+  // Collect column vectors in AMat
+  for (int i = 1; i < M; i++) { // Loop over columns
+    TMatrixD a(N,1);  // The column in A
+    TMatrixDColumn(a,0) = TMatrixDColumn(AMat,i);
+
+    // Calculate the orthogonalized vectors
+    TMatrixD ProjSum(N,1);
+
+    for (int l = 0; l < i; l++) {
+      TMatrixD NewProj(N,1);
+      TMatrixDColumn(NewProj,0) = TMatrixDColumn(QProto,l);
+      ProjSum += VectorProjectionMatrix(NewProj, a);
+      cout << "\n i =" << i << ", l = " << l << endl;
+    };
+
+    TMatrixD q(N,1);  // The column in Q
+    q = a - ProjSum;
+
+    cout << "Test! i=" << i << ", q=";
+    q.Print();
+    TMatrixDColumn(QProto,i) = TMatrixDColumn(q,0);
+  };
+
+  QMat = QProto;
 
   // Calculate RMat
   RMat = QMat.T()*AMat;

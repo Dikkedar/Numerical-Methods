@@ -1,6 +1,7 @@
 #include <iostream>
 #include <TMatrixD.h>
 #include <TVectorD.h>
+#include "MatrixUtilities.h"
 
 using namespace std;
 
@@ -9,11 +10,22 @@ int main() {
 
   TMatrixD A(N,1);
   TMatrixD B(N,1);
-  double Aarray[N] = {1.0, 2.0};
-  double Barray[N] = {2.3, 5.4};
+  double Aarray[N] = {658.0, 0.35};
+  double Barray[N] = {0.0, 1.0};
   A.SetMatrixArray(Aarray);
   B.SetMatrixArray(Barray);
 
+  TMatrixD ProjTest(N,1);
+  ProjTest = VectorProjectionMatrix(A,B);
+  ProjTest.Print();
+
+  /*
+  TMatrixD C(N,N);
+  C = RandMatInteger(N,N,10);
+  TMatrixD CTransp(N,N);
+  CTransp = Transpose(C);
+  C.Print();
+  CTransp.Print();
 
   TMatrixD C = B.T()*A;
   C.Print();
@@ -23,6 +35,6 @@ int main() {
   for (int i=5; i>=1; i--) {
     cout << "test" << i << endl;
   };
-
+  */
   return 0;
 };

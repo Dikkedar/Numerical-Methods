@@ -28,8 +28,8 @@ TMatrixD RandMatSym(int MatN) {
   return C;
 };
 
-TMatrixD RandMatInteger(int MatN, int MatM, int iMax = 10) {
-  // Returns a MatN x MatM matrix with random integer < iMax entries
+TMatrixD RandMatIntegerPos(int MatN, int MatM, int iMax = 10) {
+  // Returns a MatN x MatM matrix with random integer < iMax entries, positive
   TRandom3 Rand;
   Rand.SetSeed(0);
   TArrayD MatData(MatN*MatM);
@@ -39,12 +39,55 @@ TMatrixD RandMatInteger(int MatN, int MatM, int iMax = 10) {
   return C;
 };
 
+TMatrixD RandMatInteger(int MatN, int MatM, int iMax = 10) {
+  // Returns a MatN x MatM matrix with random integer -iMax < n < iMax
+  TRandom3 Rand;
+  Rand.SetSeed(0);
+  TArrayD MatData(MatN*MatM);
+  float avg = iMax;
+  for (int j=0; j < MatN*MatM; j++) MatData[j] = Rand.Integer(iMax+iMax)-avg;
+  TMatrixD C(MatN,MatM);
+  C.SetMatrixArray(MatData.GetArray());
+  return C;
+};
+
+TMatrixD Transpose(TMatrixD A) {
+  // Returns matrix transpose of a square matrix
+  int N = A.GetNrows();
+  TMatrixD ATransp(N,N);
+  for (int i = 0; i < N; i++) { // Loop over rows
+    for (int j = 0; j < N; j++) { // Loop over columns
+      if (i != j) {
+        TMatrixDRow(ATransp,i)[j] = TMatrixDRow(A,j)[i];
+        TMatrixDRow(ATransp,j)[i] = TMatrixDRow(A,i)[j];
+      }
+      else { // Diagonal
+        TMatrixDRow(ATransp,i)[j] = TMatrixDRow(A,i)[j];
+      }
+    };
+  };
+  return ATransp;
+};
+
 // Defining dot product of vectors, can't see if this already exists...
 double VectorDot(TVectorD A, TVectorD B) {
   // Assuming A and B have the same length
   double k = 0.0;
   int N = A.GetNoElements();
   for (int j = 0; j < N; j++) k += A[j]*B[j];
+  return k;
+};
+
+// Defining dot product of vectors, can't see if this already exists...
+double VectorDotMatrix(TMatrixD A, TMatrixD B) {
+  // Assuming A and B have the same length, Nx1 matrices
+  double k = 0.0;
+  int N = A.GetNrows();
+  for (int j = 0; j < N; j++) {
+    double Arow = TMatrixDRow(A,j)[0];
+    double Brow = TMatrixDRow(B,j)[0];
+    k += Arow*Brow;
+  };
   return k;
 };
 
