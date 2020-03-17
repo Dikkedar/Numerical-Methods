@@ -1,7 +1,7 @@
 #include <iostream>
 #include <TMatrixD.h>
 #include <TVectorD.h>
-#include "MatrixUtilities.h"
+#include "../MatrixUtilities.h"
 
 using namespace std;
 

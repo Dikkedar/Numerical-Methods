@@ -2,7 +2,7 @@
 #include <TMatrixD.h>
 #include <TVectorD.h>
 #include <TMath.h>
-#include "MatrixUtilities.h"
+#include "../MatrixUtilities.h"
 using namespace std;
 
 /*
