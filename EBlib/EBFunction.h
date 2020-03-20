@@ -5,6 +5,12 @@
 using namespace std;
 
 class EBFunction {
+  /*
+      My own function class
+      Work under construction!
+
+
+  */
 public:
   int Ndim; // Amount of variables
   int Nparams; // Amount of parametres
@@ -21,6 +27,7 @@ public:
     Nparams = FindFunctionParamDim(FunctionDefinition);
     FunctionDefinition = FunctionDef; // Save definition if supplied
     ExprParser.InfixExpr = FunctionDef; // Load definition into parser
+    ExprParser.Infix2RPN(); // Translate input expression to RPN
   };
 
 
